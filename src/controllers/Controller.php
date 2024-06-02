@@ -13,7 +13,7 @@ class Controller {
     $this->params = $params;
     $this->reqMethod = strtolower($_SERVER['REQUEST_METHOD']);
     $this->body = (array) json_decode(file_get_contents('php://input'));
-    $this->header();
+    /* $this->header(); */
     $this->ifMethodExist();
   }
 
@@ -30,20 +30,21 @@ class Controller {
     return 'Unknown';
   }
 
-  protected function header() {
-      if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        header("Access-Control-Allow-Origin: *");
-        header('Content-type: application/json; charset=utf-8');
-        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
-        http_response_code(200);
-        exit;
-      }
+  /* protected function header() {
+    header('Access-Control-Allow-Origin: *');
+    header('Content-type: application/json; charset=utf-8');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
       header('Access-Control-Allow-Origin: *');
-      header('Content-type: application/json; charset=utf-8');
       header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
       header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+      header('Access-Control-Max-Age: 86400');
+      http_response_code(200);
+      exit;
     }
+  } */
 
   protected function ifMethodExist() {
     $method = $this->reqMethod.''.$this->className;
@@ -61,5 +62,26 @@ class Controller {
     ]);
 
     return;
+  }
+
+  public function checkSession() {
+    // Valider que l'ID de session est présent
+    if (!isset($this->body['session_id'])) {
+      header('HTTP/1.1 401 Unauthorized');
+      return ['message' => 'Session ID Manquante'];
+    }
+
+    // Démarrer la session avec l'ID de session fourni
+    session_id($this->body['session_id']);
+    session_start();
+
+    // Vérifier si l'utilisateur est connecté
+    if (isset($_SESSION['user_id'])) {
+      header('HTTP/1.1 200 OK');
+      return ['message' => 'Session valide'];
+    } else {
+      header('HTTP/1.1 401 Unauthorized');
+      return ['message' => 'Session Invalide'];
+    }
   }
 }

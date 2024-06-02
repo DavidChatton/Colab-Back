@@ -89,4 +89,17 @@ class UserModel extends SqlConnect {
             return null;
         }
     }
+
+    // Méthode pour récupérer l'utilisateur par e-mail
+    public function getUserByEmail($email) {
+      try {
+          $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+          $stmt->execute([':email' => $email]);
+
+          return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+      } catch (\PDOException $e) {
+          error_log("Error in getUserByEmail: " . $e->getMessage());
+          return null;
+      }
+    }
 }
