@@ -8,14 +8,13 @@ use App\Models\UserModel;
 class Registration extends Controller {
   protected object $user;
 
-  public function __construct($param) {
+  public function __construct($param) 
+  {
     $this->user = new UserModel();
     parent::__construct($param);
   }
 
   public function postRegistration() {
-    error_log("Starting postRegistration");
-
     // Valider les entrées du formulaire
     if (!$this->validateInput($this->body)) {
       // Retourner un code de réponse HTTP 400 pour une demande incorrecte

@@ -10,6 +10,7 @@ use App\Controllers\Bots;
 use App\Controllers\Registration;
 use App\Controllers\Login;
 use App\Controllers\Logout;
+use App\Controllers\Flatshare;
 
 
 new Router([
@@ -21,6 +22,5 @@ new Router([
   'login' => Login::class,
   'logout' => Logout::class,
   'check-session' => Login::class . '::checkSession', // Ajout de la route pour vérifier la session
-  'update-flatshare' => Registration::class . '::updateFlatshare' // Ajout de la route pour la mise à jour du flatshare_id
-
+  'flatshares' => Flatshare::class
 ]);

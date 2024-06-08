@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\models;
 
 use \PDO;
 use stdClass;
-
 class UserModel extends SqlConnect {
     public function createUser(array $data) {
         try {
-            $query = "
-                INSERT INTO users (firstname, lastname, email, password, created_at)
+            $query = "INSERT INTO users (firstname, lastname, email, password, created_at)
                 VALUES (:firstname, :lastname, :email, :password, :created_at)
             ";
 
@@ -67,20 +65,6 @@ class UserModel extends SqlConnect {
         }
     }
 
-    public function updateFlatshareId(int $userId, int $flatshareId) {
-        try {
-            $query = "UPDATE users SET flatshare_id = :flatshare_id WHERE id = :id";
-            $stmt = $this->db->prepare($query);
-
-            $stmt->execute([
-                ":flatshare_id" => $flatshareId,
-                ":id" => $userId
-            ]);
-        } catch (\PDOException $e) {
-            error_log("Error in updateFlatshareId: " . $e->getMessage());
-        }
-    }
-
     public function getLastInsertedId() {
         try {
             return $this->db->lastInsertId();
@@ -102,4 +86,16 @@ class UserModel extends SqlConnect {
           return null;
       }
     }
+
+    public function getUserById($id) {
+      try {
+          $stmt = $this->db->prepare("SELECT firstname FROM users WHERE id = :id");
+          $stmt->execute([':id' => $id]);
+          return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+      } catch (\PDOException $e) {
+          error_log("Error in getUserById: " . $e->getMessage());
+          return null;
+      }
+  }
+  
 }
