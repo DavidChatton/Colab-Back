@@ -83,6 +83,6 @@ class Login extends Controller {
     } else {
       header('HTTP/1.1 401 Unauthorized');
       return ['message' => 'Invalid session'];
-  }
     }
+  }
 }

@@ -3,24 +3,26 @@
 require 'vendor/autoload.php';
 
 use App\Router;
-use App\Controllers\User;
 use App\Controllers\Messages;
 use App\Controllers\Message;
-use App\Controllers\Bots;
 use App\Controllers\Registration;
 use App\Controllers\Login;
 use App\Controllers\Logout;
 use App\Controllers\Flatshare;
-
+use App\Controllers\Profil;
+use App\Controllers\Task;
+use App\Controllers\User;
 
 new Router([
-  'user/:id' => User::class,
   'message/:id' => Message::class,
   'messages' => Messages::class,
-  'bots' => Bots::class,
   'registration' => Registration::class, // Ajout de la route pour l'inscription renommée
   'login' => Login::class,
   'logout' => Logout::class,
-  'check-session' => Login::class . '::checkSession', // Ajout de la route pour vérifier la session
-  'flatshares' => Flatshare::class
+  'check-session' => Login::class . '::checkSession',
+  'flatshares' => Flatshare::class,
+  'flatshare/join' => Flatshare::class,
+  'profil/:id' => Profil::class,
+  'tasks' => Task::class,
+  'users/:flatshare_id' => User::class
 ]);

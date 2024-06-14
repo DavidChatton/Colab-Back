@@ -89,13 +89,55 @@ class UserModel extends SqlConnect {
 
     public function getUserById($id) {
       try {
-          $stmt = $this->db->prepare("SELECT firstname FROM users WHERE id = :id");
+          $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
           $stmt->execute([':id' => $id]);
           return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+          var_dump($stmt);
       } catch (\PDOException $e) {
+          var_dump($e);
           error_log("Error in getUserById: " . $e->getMessage());
           return null;
       }
   }
-  
+
+  public function putUser($id, $data) {
+    try {
+        var_dump($data);
+        $query = "UPDATE users SET 
+                 lastname = :lastname, 
+                 email = :email, 
+                 password = :password 
+                 WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+
+        $stmt->execute([
+            ':lastname' => htmlspecialchars($data['lastname']),
+            ':email' => htmlspecialchars($data['email']),
+            ':password' => $data['password'],
+            ':id' => $id
+        ]);
+
+        return true;
+    } catch (\PDOException $e) {
+        var_dump($e);
+        error_log("Error in updateUser: " . $e->getMessage());
+        return false;
+    }
+  }
+
+  public function getUsersByFlatshare($flatshareId) {
+    try {
+        // Requête SQL pour sélectionner tous les utilisateurs d'une colocation
+        $query = "SELECT * FROM flatmates WHERE flatshare_id = :flatshare_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':flatshare_id' => $flatshareId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (\PDOException $e) {
+        error_log("Error in getUsersByFlatshare: " . $e->getMessage());
+        return [];
+    }
+}
 }

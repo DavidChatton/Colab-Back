@@ -2,52 +2,44 @@
 
 namespace App\Controllers;
 
-class User {
-  protected array $params;
-  protected string $reqMethod;
+use App\Models\UserModel;
 
-  public function __construct($params) {
-    $this->params = $params;
-    $this->reqMethod = strtolower($_SERVER['REQUEST_METHOD']);
+class User extends Controller {
+    protected object $user;
 
-    $this->run();
-  }
-
-  protected function getUser() {
-    return [
-      'firstName' => 'Cyril',
-      'lastName' => 'Vimard',
-      'promo' => 'B1',
-      'school' => 'Coda'
-    ];
-  }
-
-  protected function header() {
-    header('Access-Control-Allow-Origin: *');
-    header('Content-type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-  }
-
-  protected function ifMethodExist() {
-    $method = $this->reqMethod.'User';
-
-    if (method_exists($this, $method)) {
-      echo json_encode($this->$method());
-
-      return;
+    public function __construct($param) 
+    {
+        $this->user = new UserModel();
+        parent::__construct($param);
     }
 
-    echo json_encode([
-      'code' => '404',
-      'message' => 'Not Found'
-    ]);
+    public function getUser() {
+        try {
+            // Valider l'entrée
+            $flatshareId = $this->params['flatshare_id'] ?? null; // Assurez-vous que l'ID est bien extrait des paramètres
+            if (!$this->validateInput($flatshareId)) {
+                header('HTTP/1.1 400 Bad Request');
+                return ['message' => 'Invalid flatshare ID'];
+            }
 
-    return;
-  }
+            // Récupérer les utilisateurs par colocation
+            $users = $this->user->getUsersByFlatshare($flatshareId);
+            
+            // Retourner un code de réponse HTTP 200 pour une demande réussie
+            header('HTTP/1.1 200 OK');
+            return $users;
+        } catch (\Exception $e) {
+            header('HTTP/1.1 500 Internal Server Error');
+            return ['message' => 'Failed to fetch users', 'error' => $e->getMessage()];
+        }
+    }
 
-  protected function run() {
-    $this->header();
-    $this->ifMethodExist();
-  }
+    private function validateInput($flatshareId) {
+        // Valider que l'ID de la colocation est un entier positif
+        if (!is_numeric($flatshareId) || $flatshareId <= 0) {
+            error_log("Invalid flatshare ID: " . $flatshareId);
+            return false;
+        }
+        return true;
+    }
 }

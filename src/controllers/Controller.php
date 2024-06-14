@@ -33,6 +33,8 @@ class Controller {
   protected function ifMethodExist() {
     $method = $this->reqMethod.''.$this->className;
 
+    /* var_dump("Checking method: ", $method); */
+
     if (method_exists($this, $method)) {
       echo json_encode($this->$method());
 
@@ -49,6 +51,7 @@ class Controller {
   }
 
   public function checkSession() {
+    var_dump('session_id');
     // Valider que l'ID de session est présent
     if (!isset($this->body['session_id'])) {
       header('HTTP/1.1 401 Unauthorized');

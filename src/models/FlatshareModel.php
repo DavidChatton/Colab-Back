@@ -10,7 +10,6 @@ class FlatshareModel extends SqlConnect
     public function create(array $data)
     {
         try {
-            
             $query = "INSERT INTO flatshares (name,creation_date_flatshare, address, access_code)
                       VALUES (:name, :creation_date_flatshare, :address, :access_code)";
 
@@ -36,19 +35,70 @@ class FlatshareModel extends SqlConnect
         }
     }
 
+    public function getFlatshareByNameAndCode($name, $access_code)
+    {
+        try {
+            $query = "SELECT * FROM flatshares WHERE name = :name AND access_code = :access_code";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':name' => $name, ':access_code' => $access_code]);
+
+            $flatshare = $stmt->fetch(PDO::FETCH_ASSOC);
+            var_dump("Flatshare found:", $flatshare);
+
+            return $flatshare ? $flatshare : null;
+        } catch (\PDOException $e) {
+            var_dump($e);
+            error_log("Error in getFlatshareByNameAndCode: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public function addFlatmate($userId, $flatshareId)
     {
         try {
             $query = "INSERT INTO flatmates (user_id, flatshare_id) VALUES (:user_id, :flatshare_id)";
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':user_id' => $userId,
-                ':flatshare_id' => $flatshareId
+                ':user_id' => htmlspecialchars($userId),
+                ':flatshare_id' => htmlspecialchars($flatshareId)
             ]);
             return true;
         } catch (\PDOException $e) {
-            error_log("Error in addFlatmate: " . $e->getMessage());
+            var_dump($e);
             return false;
         }
     }
+
+    public function getUserById($userId) {
+        try {
+          $query = "SELECT * FROM users WHERE id = :id";
+          $stmt = $this->db->prepare($query);
+          $stmt->execute([':id' => $userId]);
+    
+          $user = $stmt->fetch(PDO::FETCH_ASSOC);
+          var_dump("User found:", $user);
+    
+          return $user ? $user : null;
+        } catch (\PDOException $e) {
+          var_dump($e);
+          error_log("Error in getUserById: " . $e->getMessage());
+          return null;
+        }
+      }
+
+     public function getFlatshareByUserId($userId) {
+        try {
+            $query = "SELECT access_code FROM flatshares 
+                      JOIN flatmates ON flatshares.id = flatmates.flatshare_id 
+                      WHERE flatmates.user_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':user_id' => $userId]);
+
+            return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+        } catch (\PDOException $e) {
+            var_dump($e);
+            error_log("Error in getFlatshareByUserId: " . $e->getMessage());
+            return null;
+        }
+     }
 }
