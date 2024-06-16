@@ -34,12 +34,15 @@ class Login extends Controller {
       // Si c'est le cas cela démarre une session en stockant l'ID utilisateur dans la session
       session_start();
       $_SESSION['user_id'] = $user['id'];
+      // Récupérer l'ID de la colocation
+      $flatshareId = $this->user->getFlatshareIdByUserId($user['id']);
       // Retourner un code de réponse HTTP 200 pour une connexion réussie
       header('HTTP/1.1 200 OK');
       error_log("Login successful for user ID: " . $user['id']);
       return [
         'message' => 'Login successful',
         'user_id' => $user['id'],
+        'flatshare_id' => $flatshareId,
         'session_id' => session_id()
       ];
     }

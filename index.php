@@ -13,6 +13,7 @@ use App\Controllers\Profil;
 use App\Controllers\Task;
 use App\Controllers\User;
 
+
 new Router([
   'message/:id' => Message::class,
   'messages' => Messages::class,
@@ -24,5 +25,6 @@ new Router([
   'flatshare/join' => Flatshare::class,
   'profil/:id' => Profil::class,
   'tasks' => Task::class,
-  'users/:flatshare_id' => User::class
+  'users/:flatshare_id' => User::class,
+  'createMessage'=> Message::class
 ]);

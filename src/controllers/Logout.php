@@ -19,8 +19,11 @@ class Logout extends Controller {
 
     // Détruire la session
     session_destroy();
-    // Supprimer le cookie user_id
+
+    // Supprimer les cookies
     setcookie("user_id", "", time() - 3600, "/");
+    setcookie("session_id", "", time() - 3600, "/");
+    setcookie("flatshare_id", "", time() - 3600, "/");
 
     header('HTTP/1.1 200 OK');
     return ['message' => 'Logout successful'];

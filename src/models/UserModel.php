@@ -10,7 +10,6 @@ class UserModel extends SqlConnect {
             $query = "INSERT INTO users (firstname, lastname, email, password, created_at)
                 VALUES (:firstname, :lastname, :email, :password, :created_at)
             ";
-
             $stmt = $this->db->prepare($query);
 
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
@@ -92,9 +91,9 @@ class UserModel extends SqlConnect {
           $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
           $stmt->execute([':id' => $id]);
           return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
-          var_dump($stmt);
+          /* var_dump($stmt); */
       } catch (\PDOException $e) {
-          var_dump($e);
+          /* var_dump($e); */
           error_log("Error in getUserById: " . $e->getMessage());
           return null;
       }
@@ -129,16 +128,16 @@ class UserModel extends SqlConnect {
     }
   }
 
-  public function getUsersByFlatshare($flatshareId) {
+  public function getFlatshareIdByUserId($userId) {
     try {
-        $query = "SELECT * FROM flatmates WHERE flatshare_id = :flatshare_id";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([':flatshare_id' => $flatshareId]);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $stmt = $this->db->prepare("SELECT flatshare_id FROM flatmates WHERE user_id = :user_id");
+      $stmt->execute([':user_id' => $userId]);
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      return $result ? $result['flatshare_id'] : null;
     } catch (\PDOException $e) {
-        error_log("Error in getUsersByFlatshare: " . $e->getMessage());
-        return [];
+      error_log("Error in getFlatshareIdByUserId: " . $e->getMessage());
+      return null;
     }
-}
+  }
+
 }
