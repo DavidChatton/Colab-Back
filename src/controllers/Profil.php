@@ -40,10 +40,7 @@ class Profil extends Controller
     public function putProfil()
     {
         $userId = $this->params['id'];
-        $data = $this->body;
-
-        /* var_dump("User ID: ", $userId); // Ajout de var_dump() pour afficher l'ID utilisateur
-        var_dump("Request Body: ", $data); // Ajout de var_dump() pour afficher les données du profil transmises  */   
+        $data = $this->body; 
 
         $updated = $this->userModel->putUser($userId, $data);
 
@@ -55,4 +52,6 @@ class Profil extends Controller
         }
         exit;
     }
+
+    
 }

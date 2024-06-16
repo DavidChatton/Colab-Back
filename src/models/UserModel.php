@@ -102,34 +102,35 @@ class UserModel extends SqlConnect {
 
   public function putUser($id, $data) {
     try {
-        var_dump($data);
+        if (!isset($data['lastname'], $data['email'])) {
+            throw new \Exception('Missing required fields');
+        }
+
         $query = "UPDATE users SET 
                  lastname = :lastname, 
-                 email = :email, 
-                 password = :password 
+                 email = :email 
                  WHERE id = :id";
-        $stmt = $this->db->prepare($query);
 
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare($query);
 
         $stmt->execute([
             ':lastname' => htmlspecialchars($data['lastname']),
             ':email' => htmlspecialchars($data['email']),
-            ':password' => $data['password'],
             ':id' => $id
         ]);
 
-        return true;
+        return $stmt->rowCount() > 0;
     } catch (\PDOException $e) {
-        var_dump($e);
-        error_log("Error in updateUser: " . $e->getMessage());
+        error_log("Erreur dans la méthode putUser: " . $e->getMessage());
+        return false;
+    } catch (\Exception $e) {
+        error_log("Validation error in putUser: " . $e->getMessage());
         return false;
     }
   }
 
   public function getUsersByFlatshare($flatshareId) {
     try {
-        // Requête SQL pour sélectionner tous les utilisateurs d'une colocation
         $query = "SELECT * FROM flatmates WHERE flatshare_id = :flatshare_id";
         $stmt = $this->db->prepare($query);
         $stmt->execute([':flatshare_id' => $flatshareId]);
